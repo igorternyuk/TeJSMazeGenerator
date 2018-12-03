@@ -12,5 +12,8 @@ function draw() {
 	background(0);
 }
 
-
+function Cell(i, j){
+	this.i = i;
+	this.j = j;
+}
 
