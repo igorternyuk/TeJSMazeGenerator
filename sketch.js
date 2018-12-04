@@ -16,7 +16,7 @@ function setup() {
     for(let row = 0; row < rows; ++row){
     	let line = [];
     	for(let col = 0; col < cols; ++col){
-    		line.push(new Cell(row, col))
+    		line.push(new Cell(row, col));
     	}
     	grid.push(line);
     }
@@ -36,9 +36,14 @@ function draw() {
 	background(70, 70, 70);
 
 	currentCell.visited = true;
+	currentCell.highlight();
 	let unvisited = currentCell.getUnvisitedNeighbours();
 	if(unvisited && unvisited.length > 0){
-		nextCell = unvisited[floor(random(0, unvisited.length))].cell;	
+		let randNeighbour = unvisited[floor(random(0, unvisited.length))];
+		nextCell = randNeighbour.cell;
+		let nextCellDir = randNeighbour.dir;
+		currentCell.walls[nextCellDir] = false;
+		nextCell.walls[getOppositeDirection(nextCellDir)] = false;	
 		currentCell = nextCell;
 	}
 
@@ -52,6 +57,24 @@ function draw() {
 
 function isValidCellCoords(row, col){
 	return row >= 0 && row < grid.length && col >= 0 && col < grid[row].length;
+}
+
+function getOppositeDirection(dir){
+	if(dir === Direction.NORTH){
+		return Direction.SOUTH;
+	}
+
+	if(dir === Direction.SOUTH){
+		return Direction.NORTH;
+	}
+
+	if(dir === Direction.WEST){
+		return Direction.EAST;
+	}
+
+	if(dir === Direction.EAST){
+		return Direction.WEST;
+	}
 }
 
 class Cell {
@@ -79,11 +102,18 @@ class Cell {
 	getUnvisitedNeighbours(){
 		return this.getNeighbours().filter(neighbour => !neighbour.cell.visited);
 	}
+
+	highlight(){
+		fill(0, 255, 255, 100);
+		noStroke();
+		rect(this.x, this.y, CELL_SIZE, CELL_SIZE);
+	}
 	
 	render(){
 
 		if(this.visited){
 			fill(255, 0, 255, 100);
+			noStroke();
 			rect(this.x, this.y, CELL_SIZE, CELL_SIZE);
 		}
 
